@@ -1,0 +1,8 @@
+services:
+  - type: cron
+    name: auto-link-checker
+    env: python
+    plan: free
+    schedule: "0 */2 * * *"
+    buildCommand: ""
+    startCommand: "python main.py"
