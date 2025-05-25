@@ -3,8 +3,10 @@ import time
 import requests
 from telegram import Bot
 from dotenv import load_dotenv
+from flask import Flask
 
 load_dotenv()
+app = Flask(__name__)
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
@@ -30,11 +32,18 @@ def check_url_with_proxy(url, provider_name, proxy_url):
             return f"[{provider_name}] ✅ {url} dapat diakses"
         elif "internetpositif" in r.url or r.status_code in [403, 451]:
             return f"[{provider_name}] 🚫 {url} diblokir"
+        elif r.is_redirect or r.status_code in [301, 302]:
+            return f"[{provider_name}] 🔀 {url} redirect ke {r.headers.get('Location')}"
         else:
             return f"[{provider_name}] ⚠️ {url} error {r.status_code}"
     except Exception as e:
         return f"[{provider_name}] ⚠️ {url} gagal diakses ({str(e)})"
 
+@app.route("/")
+def index():
+    return "URL checker is running."
+
+@app.route("/run")
 def run_check():
     results = []
     with open("listlink.txt") as file:
@@ -46,10 +55,11 @@ def run_check():
                     continue
                 result = check_url_with_proxy(url, provider, proxy)
                 results.append(result)
-                time.sleep(1)  # menghindari rate limit
+                time.sleep(1)  # rate limit
 
     message = "\n".join(results)
     bot.send_message(chat_id=CHAT_ID, text=message[:4096])
+    return "Check completed and sent to Telegram."
 
 if __name__ == "__main__":
-    run_check()
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
