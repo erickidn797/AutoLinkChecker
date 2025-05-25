@@ -13,10 +13,7 @@ CHAT_ID = os.getenv("CHAT_ID")
 
 PROXIES = {
     "Telkomsel": os.getenv("PROXY_TELKOMSEL"),
-    "Indosat": os.getenv("PROXY_INDOSAT"),
     "XL": os.getenv("PROXY_XL"),
-    "Smartfren": os.getenv("PROXY_SMARTFREN"),
-    "Tri": os.getenv("PROXY_TRI"),
 }
 
 bot = Bot(token=BOT_TOKEN)
