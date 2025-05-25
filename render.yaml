@@ -1,8 +1,21 @@
 services:
-  - type: cron
-    name: auto-link-checker
+  - type: web
+    name: cek-link-isp
     env: python
-    plan: free
-    schedule: "0 */2 * * *"
     buildCommand: ""
-    startCommand: "python main.py"
+    startCommand: gunicorn main:app
+    envVars:
+      - key: BOT_TOKEN
+        fromDotEnv: true
+      - key: CHAT_ID
+        fromDotEnv: true
+      - key: PROXY_TELKOMSEL
+        fromDotEnv: true
+      - key: PROXY_INDOSAT
+        fromDotEnv: true
+      - key: PROXY_XL
+        fromDotEnv: true
+      - key: PROXY_SMARTFREN
+        fromDotEnv: true
+      - key: PROXY_TRI
+        fromDotEnv: true
