@@ -5,6 +5,7 @@ from telegram import Bot
 from dotenv import load_dotenv
 from flask import Flask
 import threading
+import asyncio
 
 
 load_dotenv()
@@ -43,7 +44,7 @@ def index():
     return "URL checker is running."
 
 @app.route("/run")
-def check_all_urls():
+async def check_all_urls():
     results = []
     with open("listlink.txt") as file:
         urls = [line.strip() for line in file if line.strip()]
@@ -54,15 +55,15 @@ def check_all_urls():
                     continue
                 result = check_url_with_proxy(url, provider, proxy)
                 results.append(result)
-                time.sleep(1)  # rate limit
+                time.sleep(1)
 
     message = "\n".join(results)
-    bot.send_message(chat_id=CHAT_ID, text=message[:4096])
+    await bot.send_message(chat_id=CHAT_ID, text=message[:4096])
 
 
 def scheduler():
     while True:
-        check_all_urls()
+        asyncio.run(check_all_urls())
         time.sleep(7200)  # 2 jam = 7200 detik
 
 # Mulai thread scheduler di background
