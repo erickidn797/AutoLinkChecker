@@ -41,7 +41,7 @@ def index():
     return "URL checker is running."
 
 @app.route("/run")
-def run_check():
+def check_all_urls():
     results = []
     with open("listlink.txt") as file:
         urls = [line.strip() for line in file if line.strip()]
@@ -56,7 +56,16 @@ def run_check():
 
     message = "\n".join(results)
     bot.send_message(chat_id=CHAT_ID, text=message[:4096])
-    return "Check completed and sent to Telegram."
+
+
+def scheduler():
+    while True:
+        check_all_urls()
+        time.sleep(7200)  # 2 jam = 7200 detik
+
+# Mulai thread scheduler di background
+threading.Thread(target=scheduler, daemon=True).start()
 
 if __name__ == "__main__":
+    threading.Thread(target=scheduler, daemon=True).start()
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
